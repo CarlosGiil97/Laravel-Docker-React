@@ -1,0 +1,66 @@
+version: "3.7"
+services:
+
+  backend:
+    image: backend
+    build: ./backend
+    working_dir: /var/www/
+    volumes:
+      - ./backend:/var/www/
+      - ./backend/public:/var/www/html
+    ports:
+      - 8000:80
+    restart: unless-stopped
+    tty: true
+    environment:
+      SERVICE_NAME: app
+      SERVICE_TAGS: dev
+    networks:
+      - app
+  frontend:
+    image: node:14-alpine
+    working_dir: /app
+    command: "npm run start"
+    volumes:
+      - ./frontend:/app/
+    ports:
+      - 3000:3000
+    depends_on:
+      - db
+    networks:
+      - app
+
+  db:
+    platform: linux/x86_64
+    image: mysql:8.0.26
+    container_name: db
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: techpump
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_PASSWORD: root
+      SERVICE_TAGS: dev
+      SERVICE_NAME: mysql
+
+    networks:
+      - app
+  phpmyadmin:
+    image: "phpmyadmin:latest"
+    environment:
+      - PMA_ARBITRARY=1
+      - PMA_HOST=db
+    networks:
+      - app
+    ports:
+      - "8001:80"
+    depends_on:
+      - db
+networks:
+  app:
+    driver: bridge
+volumes:
+  dbdata:
+    driver: local
