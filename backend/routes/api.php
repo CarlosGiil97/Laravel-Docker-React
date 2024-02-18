@@ -15,7 +15,21 @@ use App\Http\Controllers\ProductController;
 |
 */
 
-Route::get('products', [ProductController::class, 'index']);
+
+Route::middleware('auth.apikey')->group(function () {
+    /**
+     * Obtener todos los productos.
+     */
+    Route::get('products', [ProductController::class, 'index']);
+    /**
+     * Obtener un producto específico por su ID.
+     */
+    Route::get('products/{id}', [ProductController::class, 'show']);
+});
+
+
+
+
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
