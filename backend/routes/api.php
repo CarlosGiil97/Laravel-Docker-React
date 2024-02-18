@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\CartController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,6 +26,16 @@ Route::middleware('auth.apikey')->group(function () {
      * Obtener un producto específico por su ID.
      */
     Route::get('products/{id}', [ProductController::class, 'show']);
+
+    /**
+     * Obtener  toda la info de un carrito por su ID
+     */
+    Route::get('/carts/{cartId}', [CartController::class, 'getCart']);
+
+    /**
+     * Obtener productos de un carrito por su ID
+     */
+    Route::get('/carts/{cartId}/products', [CartController::class, 'getProductsCart']);
 });
 
 
