@@ -36,6 +36,16 @@ Route::middleware('auth.apikey')->group(function () {
      * Obtener productos de un carrito por su ID
      */
     Route::get('/carts/{cartId}/products', [CartController::class, 'getProductsCart']);
+
+    /**
+     * Añadir un producto a un carrito
+     */
+    Route::post('/carts/{cartId}/add/{productId}/{qty}', [CartController::class, 'addItemToCart']);
+
+    /**
+     * Eliminar un producto a un carrito
+     */
+    Route::post('/carts/{cartId}/remove/{productId}', [CartController::class, 'removeItemFromCart']);
 });
 
 

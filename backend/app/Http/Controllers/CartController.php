@@ -37,4 +37,16 @@ class CartController extends Controller
 
         return response()->json(['products' => $products], 200);
     }
+
+
+    public function addItemToCart($idCart, $idProduct, $qty = 1)
+    {
+        return $this->cartService->addItemToCart($idCart, $idProduct, $qty);
+    }
+
+
+    public function removeItemFromCart($idCart, $idProduct)
+    {
+        return $this->cartService->removeItemFromCart($idCart, $idProduct);
+    }
 }
