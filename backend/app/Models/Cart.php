@@ -17,4 +17,12 @@ class Cart extends Model
     {
         return $this->belongsToMany(Product::class)->withPivot('quantity');
     }
+
+    /**
+     * Obtener el pedido asociado al carrito.
+     */
+    public function order()
+    {
+        return $this->hasOne(Order::class);
+    }
 }

@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\OrderController;
 
 /*
 |--------------------------------------------------------------------------
@@ -46,6 +47,16 @@ Route::middleware('auth.apikey')->group(function () {
      * Eliminar un producto a un carrito
      */
     Route::post('/carts/{cartId}/remove/{productId}', [CartController::class, 'removeItemFromCart']);
+
+    /**
+     * Crea un pedido respecto un carrito
+     */
+    Route::post('/carts/{cartId}/checkout', [OrderController::class, 'generateOrder']);
+
+    /**
+     * Obtener un pedido por su ID
+     */
+    Route::get('/orders/{orderId}', [OrderController::class, 'getOrder']);
 });
 
 
