@@ -127,14 +127,30 @@ class CartService
             ], 404);
         }
 
+
+
         // antes de agregar al carrito el producto, se comprueba si ya tiene ese producto en el carrito para que en vez de meter la fila entera,
         //solo actualize la cantidad
         $existingProduct = $cart->products()->find($product_id);
 
         if ($existingProduct) {
+
+            //comprobars si hay stock suficiente de ese producto
+            if ($product->stock < $existingProduct->pivot->quantity + $qty) {
+                return response()->json([
+                    'message' => 'No hay suficiente stock de este producto, solamente hay  ' . $product->stock . ' unidades disponibles.'
+                ], 400);
+            }
             $existingProduct->pivot->quantity += $qty;
             $existingProduct->pivot->save();
         } else {
+            //comprobars si hay stock suficiente de ese producto
+            if ($product->stock < $qty) {
+                return response()->json([
+                    'message' => 'No hay suficiente stock de este producto, solamente hay ' . $product->stock . ' unidades disponibles.'
+                ], 400);
+            }
+
             // Si el producto no está en el carrito, agregarlo con la cantidad especificada
             $cart->products()->attach($product, ['quantity' => $qty]);
         }
