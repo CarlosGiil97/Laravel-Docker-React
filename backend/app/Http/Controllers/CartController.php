@@ -30,12 +30,7 @@ class CartController extends Controller
 
     public function getProductsCart(Request $request, $cartId)
     {
-        $products = $this->cartService->getProductsCart($cartId);
-        if (!$products) {
-            return response()->json(['message' => 'Cart not found'], 404);
-        }
-
-        return response()->json(['products' => $products], 200);
+        return $this->cartService->getProductsCart($cartId);
     }
 
 

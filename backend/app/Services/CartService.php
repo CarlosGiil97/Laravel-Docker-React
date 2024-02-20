@@ -34,10 +34,11 @@ class CartService
     {
         $cart = Cart::find($cartId);
         if (!$cart) {
-            return null;
+            return response()->json(['message' => 'Cart not found'], 404);
         }
 
-        return $cart->products()->with('categories')->get();
+        $products = $cart->products()->with('categories')->get();;
+        return response()->json(['products' => $products], 200);
     }
 
     /**     
@@ -111,7 +112,7 @@ class CartService
     {
 
         try {
-            $cart = Cart::findOrFail($cart_id);
+            $cart = Cart::where('id', $cart_id)->where('done', 0)->firstOrFail();
         } catch (ModelNotFoundException $exception) {
             return response()->json([
                 'message' => 'Cart not found'
@@ -154,7 +155,7 @@ class CartService
     public function removeItemFromCart($cart_id, $product_id)
     {
         try {
-            $cart = Cart::findOrFail($cart_id);
+            $cart = Cart::where('id', $cart_id)->where('done', 0)->firstOrFail();
         } catch (ModelNotFoundException $exception) {
             return response()->json([
                 'message' => 'Cart not found'
@@ -178,5 +179,20 @@ class CartService
             'message' => 'Producto eliminado con éxito del carrito',
             'cart' => $cart
         ], 200);
+    }
+
+    /**
+     * Marcar un carrito como completado.
+     *
+     * @param int $cartId El ID del carrito que se quiere marcar como completado.
+     * @return void
+     */
+    public function markCartAsCompleted($cartId)
+    {
+        $cart = Cart::where('id', $cartId)->where('done', 0)->firstOrFail();
+        if ($cart) {
+            $cart->done = true;
+            $cart->save();
+        }
     }
 }

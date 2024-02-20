@@ -6,8 +6,17 @@ use App\Models\Cart;
 use App\Models\Product;
 use App\Models\Order;
 
+
 class OrderService
 {
+
+    protected $cartService;
+
+    public function __construct(CartService $cartService)
+    {
+        $this->cartService = $cartService;
+    }
+
     /**
      * Obtener la información de un pedido en concreto.
      *
@@ -38,7 +47,7 @@ class OrderService
     public function generateOrder($cartId)
     {
         try {
-            $cart = Cart::find($cartId);
+            $cart = Cart::where('id', $cartId)->where('done', 0)->firstOrFail();
             if (!$cart) {
                 return response()->json(['message' => 'Carrito no encontrado'], 404);
             }
@@ -61,6 +70,55 @@ class OrderService
             return response()->json(['message' => 'Pedido generado con éxito', 'order' => $order, 'products' => $products], 200);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Error al generar el pedido', 'msg' => $e->getMessage()], 400);
+        }
+    }
+
+    /**
+     * 
+     * Completar un pedido.
+     * 
+     */
+
+    public function completeOrder($orderId)
+    {
+        try {
+            $order = Order::find($orderId);
+            if (!$order) {
+                return response()->json(['message' => 'Pedido no encontrado'], 404);
+            }
+
+            $order->paid = true;
+            $order->save();
+
+            //el carrito se marca como finalizado también
+            $this->cartService->markCartAsCompleted($order->cart_id);
+
+
+            //hay que iterar el pedido y restar el stock de cada producto
+            $this->updateProductStock($order);
+
+
+            return response()->json(['message' => 'Pedido completado con éxito', 'order' => $order], 200);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Error al completar el pedido'], 400);
+        }
+    }
+
+    /**
+     * Actualiza el stock de los productos que contiene ese pedido
+     *
+     * @param \App\Models\Order $order El pedido completado
+     * @return void
+     */
+    private function updateProductStock(Order $order)
+    {
+        $products = $order->cart->products()->withPivot('quantity')->get();
+
+        foreach ($products as $product) {
+            $pivotData = $product->pivot;
+            $quantity = $pivotData->quantity;
+            $product->stock -= $quantity;
+            $product->save();
         }
     }
 

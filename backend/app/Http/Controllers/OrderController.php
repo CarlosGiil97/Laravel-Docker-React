@@ -24,4 +24,10 @@ class OrderController extends Controller
     {
         return $this->orderService->generateOrder($cartId);
     }
+
+
+    public function completeOrder($orderId)
+    {
+        return $this->orderService->completeOrder($orderId);
+    }
 }

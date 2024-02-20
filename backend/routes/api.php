@@ -19,6 +19,7 @@ use App\Http\Controllers\OrderController;
 
 
 Route::middleware('auth.apikey')->group(function () {
+
     /**
      * Obtener todos los productos.
      */
@@ -57,6 +58,11 @@ Route::middleware('auth.apikey')->group(function () {
      * Obtener un pedido por su ID
      */
     Route::get('/orders/{orderId}', [OrderController::class, 'getOrder']);
+
+    /**
+     * Finalizar pedido
+     */
+    Route::post('/orders/{orderId}/complete', [OrderController::class, 'completeOrder']);
 });
 
 
