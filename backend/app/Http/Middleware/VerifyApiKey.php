@@ -13,7 +13,6 @@ class VerifyApiKey
         $apiKey = $request->header('X-API-KEY');
 
 
-
         if (!$apiKey) {
             return response()->json(['error' => 'API key missing'], 401);
         }
